@@ -2,12 +2,13 @@ from fastapi import APIRouter
 from ..database import *
 from ..utils import parse_recipe
 import google.generativeai as genai
+import os
 chat_router = APIRouter(
     prefix="/chat",
     tags=["chat"],   
 )
 
-@chat_router.get('/', response_model=ResponseSingle[Recipe])
+@chat_router.get('/', response_model=ResponseSingle[str])
 def chat(query: str, conn : DATABASE):
     """
     Query the Chatbot about the recipe
@@ -38,13 +39,12 @@ User Preferences:
 - Recipies user have: {selected_recipies}.
 Given the user’s preferences and available recipes, recommend the most suitable recipe from the list.
 """
-        genai.configure(api_key="AIzaSyB2w89aSQVBd789r-ABGUBfCnNzaweDsHg")
+        genai.configure(api_key=os.getenv('GEMINI_TOKEN'))
         model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content(PROMPT)
-        
-        
-        resp = ResponseSingle[Recipe](data=selected_recipies, message=PROMPT, success=True)
+        resp_text = response.text
+        resp = ResponseSingle[str](data=resp_text, message='', success=True)
         return resp
     else:
-        return ResponseSingle[Recipe](data=None, message="No recipe found with available ingredients", success=False)
+        return ResponseSingle[str](data=None, message="No recipe found with available ingredients", success=False)
     
