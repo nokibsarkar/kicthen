@@ -38,11 +38,19 @@ def get_db():
 def init_db():
     # Create the database
     SQLModel.metadata.create_all(engine)
-
+    ingredients = [
+        Ingredient(name="oil", quantity=1, unit=Unit.ml),
+        Ingredient(name="salt", quantity=1, unit=Unit.kg),
+        Ingredient(name="beef", quantity=1, unit=Unit.kg),
+        Ingredient(name="garlic", quantity=1, unit=Unit.piece),
+    ]
+    with Session(engine) as session:
+        session.add_all(ingredients)
+        session.commit()
 T = TypeVar("T")
 
 class ResponseSingle(SQLModel, Generic[T]):
-    data: T
+    data: T | None
     message: str
     success: bool
 

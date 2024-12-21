@@ -6,4 +6,4 @@ ingredients: oil, salt, beef, garlic
 process: Prepare fish and fry.
 ingredients: oil, salt, fish, breadcrumbs
 
-3. 
+3. Recipe-sweet:

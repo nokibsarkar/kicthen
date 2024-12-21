@@ -17,7 +17,7 @@ def parse_recipe_file(file_path: str):
             recipes.append({
                 "title": title,
                 "process": process,
-                "ingredients": ingredients
+                "ingredients": list(sorted(ingredients))
             })
     return recipes
 
