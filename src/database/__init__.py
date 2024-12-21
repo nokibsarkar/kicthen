@@ -18,12 +18,27 @@ model Ingredient {
 }
 
 """
-from sqlmodel import SQLModel, Field
+from fastapi import Depends
+from sqlmodel import SQLModel, Field, create_engine, Session
+from typing import Annotated
+from .ingredients import *
+
+
 DB_URL = 'sqlite:///./test.sqlite3'
+engine = create_engine(DB_URL)
+
 def get_db():
-    db = SessionLocal()
+    db = Session(engine)
     try:
         yield db
     finally:
         db.close()
 
+def init_db():
+    # Create the database
+    SQLModel.metadata.create_all(engine)
+
+
+
+
+DATABASE = Annotated[Session, Depends(get_db)]
