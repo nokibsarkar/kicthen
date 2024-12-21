@@ -1,24 +1,14 @@
 from fastapi import APIRouter
 from typing import Generic, TypeVar, Any, List
+from sqlmodel import select
 from sqlmodel import SQLModel
-from ..database import DATABASE, IngredientCreate, Ingredient
+from ..database import DATABASE, IngredientCreate, Ingredient, IngredientUpdate, ResponseSingle, ResponseMultiple
 ingredients_router = APIRouter(
     prefix="/ingredients",
     tags=["ingredients"],
     responses={404: {"description": "Not found"}},
 )
 
-T = TypeVar("T")
-
-class ResponseSingle(SQLModel, Generic[T]):
-    data: T
-    message: str
-    success: bool
-
-class ResponseMultiple(SQLModel, Generic[T]):
-    data: List[T]
-    message: str
-    success: bool
 
 @ingredients_router.post('/', response_model=ResponseSingle[Ingredient])
 def create_ingredent(conn : DATABASE, ingredient: IngredientCreate):
@@ -37,34 +27,76 @@ def create_ingredent(conn : DATABASE, ingredient: IngredientCreate):
         return resp
     except Exception as e:
         conn.rollback()
-        return {"message": "An error occurred"}
+        return ResponseSingle[Ingredient](data=None, message="An error occurred", success=False)
 
 
 @ingredients_router.get('/', response_model=ResponseMultiple[Ingredient])
-def get_all_ingredient():
+def get_all_ingredient(conn : DATABASE):
   """
   Get all ingredients
   """
-  return {"data": "all ingredients"}
+  try:
+    stmt = select(Ingredient).order_by(Ingredient.id)
+    ingredients = conn.exec(stmt).all()
+    resp = ResponseMultiple[Ingredient](data=ingredients, message="Ingredients retrieved successfully", success=True)
+    return resp
+  except Exception as e:
+    return ResponseMultiple[Ingredient](data=[], message="An error occurred", success=False)
 
 
 @ingredients_router.get("/{id}", response_model=ResponseSingle[Ingredient])
-def get_ingredient():
-  """
-    get a particular ingredient
-  """
-  
-  return {"data": "A single ingredient"}
+def get_ingredient(id : int, conn : DATABASE):
+    """
+        get a particular ingredient
+    """
+    try:
+        stmt = select(Ingredient).where(Ingredient.id == id).limit(1)
+        ingredient = conn.exec(stmt).first()
+        if not ingredient:
+            raise Exception("Ingredient not found")
+        return ResponseSingle[Ingredient](data=ingredient, message="Ingredient retrieved successfully", success=True)
+    except Exception as e:
+        return ResponseSingle[Ingredient](data=None, message="An error occurred", success=False)
 
 @ingredients_router.patch("/{id}", response_model=ResponseSingle[Ingredient])
-def update_ingredient():
-  
-  return {"data" : "update....."}
+def update_ingredient(id : int, conn : DATABASE, update : IngredientUpdate):
+    """
+    Update a particular ingredient
+    """
+    try:
+        stmt = select(Ingredient).where(Ingredient.id == id).limit(1)
+        ingredient = conn.exec(stmt).first()
+        if not ingredient:
+            raise Exception("Ingredient not found")
+        # update the ingredient
+        if update.name:
+            ingredient.name = update.name
+        if update.quantity:
+            ingredient.quantity = update.quantity
+        if update.unit:
+            ingredient.unit = update.unit
+        conn.commit()
+        conn.refresh(ingredient)
+        return ResponseSingle[Ingredient](data=ingredient, message="Ingredient updated successfully", success=True)
+    except Exception as e:
+        conn.rollback()
+        return ResponseSingle[Ingredient](data=None, message="An error occurred", success=False)
+
 
 
 @ingredients_router.delete("/{id}", response_model=ResponseSingle[Ingredient])
-def delete_ingredient():
-  """
-  Delete a particular ingredient
-  """
-  return {"data": "delete ingredient"}
+def delete_ingredient(id : int, conn : DATABASE):
+    """
+    Delete a particular ingredient
+    """
+    try:
+        stmt = select(Ingredient).where(Ingredient.id == id).limit(1)
+        ingredient = conn.exec(stmt).first()
+        if not ingredient:
+            raise Exception("Ingredient not found")
+        conn.delete(ingredient)
+        conn.commit()
+        return ResponseSingle[Ingredient](data=ingredient, message="Ingredient deleted successfully", success=True)
+    except Exception as e:
+        conn.rollback()
+        return ResponseSingle[Ingredient](data=None, message="An error occurred", success=False)

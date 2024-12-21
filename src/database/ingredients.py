@@ -46,3 +46,7 @@ class IngredientCreate(SQLModel):
     name: str
     quantity: int
     unit: Unit
+class IngredientUpdate(SQLModel):
+    name: str | None = None
+    quantity: int | None = None
+    unit: Unit | None = None

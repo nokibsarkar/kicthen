@@ -20,7 +20,7 @@ model Ingredient {
 """
 from fastapi import Depends
 from sqlmodel import SQLModel, Field, create_engine, Session
-from typing import Annotated
+from typing import Annotated, List, Generic, TypeVar
 from .ingredients import *
 
 
@@ -38,6 +38,17 @@ def init_db():
     # Create the database
     SQLModel.metadata.create_all(engine)
 
+T = TypeVar("T")
+
+class ResponseSingle(SQLModel, Generic[T]):
+    data: T
+    message: str
+    success: bool
+
+class ResponseMultiple(SQLModel, Generic[T]):
+    data: List[T]
+    message: str
+    success: bool
 
 
 
