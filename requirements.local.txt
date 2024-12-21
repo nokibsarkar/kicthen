@@ -4,3 +4,4 @@ python-dotenv
 uvicorn
 pytest
 httpx
+pytest-cov
