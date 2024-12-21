@@ -8,7 +8,7 @@ class KitchenManager(FastAPI):
         super().__init__(*args, **kwargs)
         self.include_router(ingredients_router)
         self.include_router(chat_router)
-        # init_db()
+        init_db()
 app = KitchenManager(
     title="Kitchen Manager",
     description="Manage your kitchen inventory",
