@@ -32,8 +32,7 @@ class Unit(Enum):
 
 
 class Ingredient(SQLModel, table=True):
-    id: int  | None = Field(default=None, primary_key=True)
-    name: str
+    name: str = Field(primary_key=True)
     quantity: int
     unit: Unit
     # createdAt: datetime = Field(default=None)

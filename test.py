@@ -17,11 +17,11 @@ def db():
 def test_create_ingredient(db):
     response = client.post(
         "/ingredients/",
-        json={"name": "Sugar", "quantity": 5, "unit": "kg"}
+        json={"name": "sugar", "quantity": 5, "unit": "kg"}
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["data"]["name"] == "Sugar"
+    assert data["data"]["name"] == "sugar"
     assert data["data"]["quantity"] == 5
     assert data["data"]["unit"] == "kg"
     assert data["success"] == True
@@ -30,5 +30,6 @@ def test_get_all_ingredients(db):
     response = client.get("/ingredients/")
     assert response.status_code == 200
     data = response.json()
+    print(data)
     assert len(data["data"]) > 0
     assert data["success"] == True

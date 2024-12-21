@@ -19,9 +19,10 @@ model Ingredient {
 
 """
 from fastapi import Depends
-from sqlmodel import SQLModel, Field, create_engine, Session
+from sqlmodel import SQLModel, Field, create_engine, Session, select
 from typing import Annotated, List, Generic, TypeVar
 from .ingredients import *
+from .recipe import *
 
 
 DB_URL = 'sqlite:///./test.sqlite3'

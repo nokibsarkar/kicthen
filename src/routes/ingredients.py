@@ -38,7 +38,7 @@ def get_all_ingredient(conn : DATABASE):
   Get all ingredients
   """
   try:
-    stmt = select(Ingredient).order_by(Ingredient.id)
+    stmt = select(Ingredient).order_by(Ingredient.name)
     ingredients = conn.exec(stmt).all()
     resp = ResponseMultiple[Ingredient](data=ingredients, message="Ingredients retrieved successfully", success=True)
     return resp
@@ -49,12 +49,12 @@ def get_all_ingredient(conn : DATABASE):
 
 
 @ingredients_router.get("/{id}", response_model=ResponseSingle[Ingredient])
-def get_ingredient(id : int, conn : DATABASE):
+def get_ingredient(id : str, conn : DATABASE):
     """
         get a particular ingredient
     """
     try:
-        stmt = select(Ingredient).where(Ingredient.id == id).limit(1)
+        stmt = select(Ingredient).where(Ingredient.name == id).limit(1)
         ingredient = conn.exec(stmt).first()
         if not ingredient:
             raise Exception("Ingredient not found")
@@ -67,12 +67,12 @@ def get_ingredient(id : int, conn : DATABASE):
 
 
 @ingredients_router.patch("/{id}", response_model=ResponseSingle[Ingredient])
-def update_ingredient(id : int, conn : DATABASE, update : IngredientUpdate):
+def update_ingredient(id : str, conn : DATABASE, update : IngredientUpdate):
     """
     Update a particular ingredient
     """
     try:
-        stmt = select(Ingredient).where(Ingredient.id == id).limit(1)
+        stmt = select(Ingredient).where(Ingredient.name == id).limit(1)
         ingredient = conn.exec(stmt).first()
         if not ingredient:
             raise Exception("Ingredient not found")
