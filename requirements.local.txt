@@ -3,3 +3,4 @@ sqlmodel
 python-dotenv
 uvicorn
 pytest
+httpx
