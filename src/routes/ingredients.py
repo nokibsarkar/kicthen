@@ -6,7 +6,7 @@ from ..database import DATABASE, IngredientCreate, Ingredient, IngredientUpdate,
 ingredients_router = APIRouter(
     prefix="/ingredients",
     tags=["ingredients"],
-    responses={404: {"description": "Not found"}},
+    
 )
 
 
@@ -30,6 +30,8 @@ def create_ingredent(conn : DATABASE, ingredient: IngredientCreate):
         return ResponseSingle[Ingredient](data=None, message="An error occurred", success=False)
 
 
+
+
 @ingredients_router.get('/', response_model=ResponseMultiple[Ingredient])
 def get_all_ingredient(conn : DATABASE):
   """
@@ -42,6 +44,8 @@ def get_all_ingredient(conn : DATABASE):
     return resp
   except Exception as e:
     return ResponseMultiple[Ingredient](data=[], message="An error occurred", success=False)
+
+
 
 
 @ingredients_router.get("/{id}", response_model=ResponseSingle[Ingredient])
@@ -57,6 +61,10 @@ def get_ingredient(id : int, conn : DATABASE):
         return ResponseSingle[Ingredient](data=ingredient, message="Ingredient retrieved successfully", success=True)
     except Exception as e:
         return ResponseSingle[Ingredient](data=None, message="An error occurred", success=False)
+
+
+
+
 
 @ingredients_router.patch("/{id}", response_model=ResponseSingle[Ingredient])
 def update_ingredient(id : int, conn : DATABASE, update : IngredientUpdate):
@@ -81,6 +89,8 @@ def update_ingredient(id : int, conn : DATABASE, update : IngredientUpdate):
     except Exception as e:
         conn.rollback()
         return ResponseSingle[Ingredient](data=None, message="An error occurred", success=False)
+
+
 
 
 
